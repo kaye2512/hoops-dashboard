@@ -104,7 +104,7 @@ export default function SignIn() {
                       toast.error(ctx.error.message);
                     },
                     onSuccess: async () => {
-                      router.push("/auth");
+                      router.push("/");
                     },
                   }
                 );
@@ -131,7 +131,7 @@ export default function SignIn() {
                   await signIn.social(
                     {
                       provider: "google",
-                      callbackURL: "/auth",
+                      callbackURL: "/",
                     },
                     {
                       onRequest: () => {
@@ -177,7 +177,7 @@ export default function SignIn() {
                   await signIn.social(
                     {
                       provider: "github",
-                      callbackURL: "/auth",
+                      callbackURL: "/",
                     },
                     {
                       onRequest: () => {
