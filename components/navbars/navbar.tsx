@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import StoreSwitcher from "../store-switcher";
 import MainNav from "./main-nav";
 import ThemeToggle from "../theme-toggle";
+import SignOutButton from "../buttons/signout-button";
 
 export default async function Navbar() {
   // check if user is connected
@@ -24,6 +25,7 @@ export default async function Navbar() {
         <StoreSwitcher items={stores} />
         <MainNav className="mx-6" />
         <div className={"ml-auto flex items-center space-x-4"}>
+          <SignOutButton />
           <ThemeToggle />
         </div>
       </div>

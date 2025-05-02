@@ -13,6 +13,11 @@ export default function MainNav(props: { className?: string }) {
       label: "Dashboard",
       active: pathname === `/${params.storeId}`,
     },
+    {
+      href: `/${params.storeId}/billboards`,
+      label: "Billboards",
+      active: pathname === `/${params.storeId}/billboards`,
+    },
   ];
 
   return (

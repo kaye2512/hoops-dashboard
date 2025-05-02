@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { toast } from "sonner";
 import { createStoreAction } from "@/actions/store-action";
 import { useRouter } from "next/navigation";
@@ -23,19 +22,23 @@ import { useServerAction } from "zsa-react";
 import { Loader2 } from "lucide-react";
 
 const storeSchema = z.object({
-  name: z.string().min(1, "Store name is required"),
+  name: z
+    .string()
+    .min(1, "Store name is required")
+    .refine((val) => !/<[^>]*>/g.test(val), {
+      message: "HTML tags are not allowed in the store name",
+    }),
 });
 
 export default function StoreModal() {
   const storeModal = useStoreModal();
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const { isPending, execute } = useServerAction(createStoreAction, {
     onSuccess: () => {
-      toast.success("Store created successfully");
       router.refresh();
       storeModal.onClose();
+      toast.success("Store created successfully");
     },
     onError: () => {
       toast.error("Something went wrong");
@@ -50,15 +53,8 @@ export default function StoreModal() {
   });
 
   const onSubmit = async (values: z.infer<typeof storeSchema>) => {
-    try {
-      setLoading(true);
-      await execute(values);
-      form.reset();
-    } catch {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    await execute(values);
+    form.reset();
   };
 
   return (
@@ -80,7 +76,7 @@ export default function StoreModal() {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={loading}
+                        disabled={isPending}
                         placeholder="E-commerce"
                         {...field}
                       />
@@ -91,13 +87,13 @@ export default function StoreModal() {
               />
               <div className="pt-6 space-x-2 flex items-center justify-end w-full">
                 <Button
-                  disabled={loading}
+                  disabled={isPending}
                   variant="outline"
                   onClick={storeModal.onClose}
                 >
                   Cancel
                 </Button>
-                <Button disabled={loading} type="submit">
+                <Button disabled={isPending} type="submit">
                   {isPending ? (
                     <Loader2 className="animate-spin" size={16} />
                   ) : (
