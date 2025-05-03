@@ -1,8 +1,6 @@
 import { createServerAction, createServerActionProcedure, ZSAError } from "zsa";
 import { getUser } from "../auth-session";
 
-export const action = createServerAction();
-
 const authedProcedure = createServerActionProcedure().handler(async () => {
   try {
     const user = await getUser();
@@ -16,3 +14,5 @@ const authedProcedure = createServerActionProcedure().handler(async () => {
 });
 
 export const authedAction = authedProcedure.createServerAction();
+
+export const action = createServerAction();

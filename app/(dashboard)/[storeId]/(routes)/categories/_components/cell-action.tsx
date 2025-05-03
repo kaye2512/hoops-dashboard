@@ -11,13 +11,14 @@ import {
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { BillboardColumn } from "./columns";
+
 import { toast } from "sonner";
 import { useServerActionMutation } from "@/lib/zod-server-action/zsa-query";
-import { deleteBillboardAction } from "../[billboardId]/_actions/billboardId-action";
+import { CategoryColumn } from "./columns";
+import { deleteCategoryAction } from "../[categoryId]/_actions/category-action";
 
 interface CellActionProps {
-  data: BillboardColumn;
+  data: CategoryColumn;
 }
 
 export default function CellAction(props: CellActionProps) {
@@ -30,9 +31,9 @@ export default function CellAction(props: CellActionProps) {
     toast.success("Billboards id copied to the clipboard");
   };
 
-  const onDelete = useServerActionMutation(deleteBillboardAction, {
+  const onDelete = useServerActionMutation(deleteCategoryAction, {
     onSuccess: () => {
-      toast.success("Billboard deleted");
+      toast.success("Categories deleted");
       router.refresh(); // refresh the data
     },
     onError: () => {
@@ -63,7 +64,7 @@ export default function CellAction(props: CellActionProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              router.push(`/${params.storeId}/billboards/${props.data.id}`)
+              router.push(`/${params.storeId}/categories/${props.data.id}`)
             }
           >
             <Edit className={"mr-2 h-4 w-4"} />
