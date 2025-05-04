@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Heading from "@/components/ui/heading";
-import { Billboard } from "@prisma/client";
+import { Color } from "@prisma/client";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -22,41 +22,41 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import {
-  createBillboardAction,
-  deleteBillboardAction,
-  updateBillboardAction,
-} from "../../_actions/billboard-action";
-import ImageUpload from "@/components/ui/image-upload";
 import { useServerActionMutation } from "@/lib/zod-server-action/zsa-query";
+import {
+  createColorAction,
+  deleteColorAction,
+  updateColorAction,
+} from "../../_actions/color-action";
 
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  value: z.string().min(1),
 });
-type BillboardsFormValues = z.infer<typeof formSchema>;
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+type ColorsFormValues = z.infer<typeof formSchema>;
+
+interface ColorsFormProps {
+  initialData: Color | null;
 }
 
-export default function BillboardForm({ initialData }: BillboardFormProps) {
+export default function ColorForm({ initialData }: ColorsFormProps) {
   const params = useParams();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
 
-  const title = initialData ? "Edit billboard" : "Create billboard";
-  const description = initialData ? "Edit billboard" : "Add a new billboard";
-  const toastMessage = initialData ? "Billoard updated" : "Billboard created";
+  const title = initialData ? "Edit color" : "Create color";
+  const description = initialData ? "Edit color" : "Add a new color";
+  const toastMessage = initialData ? "Color updated" : "Color created";
   const action = initialData ? "Save changes" : "Create";
 
   const { isPending: isCreatePending, mutate: createMutate } =
-    useServerActionMutation(createBillboardAction, {
+    useServerActionMutation(createColorAction, {
       onSuccess: () => {
         toast.success(toastMessage);
         router.refresh();
-        router.push(`/${params.storeId}/billboards`);
+        router.push(`/${params.storeId}/colors`);
       },
       onError: () => {
         toast.error("Something went wrong");
@@ -64,52 +64,60 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     });
 
   const { isPending: isUpdatePending, mutate: updateMutate } =
-    useServerActionMutation(updateBillboardAction, {
+    useServerActionMutation(updateColorAction, {
       onSuccess: () => {
         toast.success(toastMessage);
         router.refresh();
-        router.push(`/${params.storeId}/billboards`);
+        router.push(`/${params.storeId}/colors`);
       },
       onError: () => {
         toast.error("Something went wrong");
       },
     });
 
-  const isPending = isCreatePending || isUpdatePending;
+  const { isPending: isDeletePending, mutate: deleteMutate } =
+    useServerActionMutation(deleteColorAction, {
+      onSuccess: () => {
+        toast.success("Color deleted");
+        router.refresh();
+        router.push(`/${params.storeId}/colors`);
+      },
+      onError: () => {
+        toast.error("Something went wrong");
+      },
+    });
 
-  const form = useForm<BillboardsFormValues>({
+  const isPending = isCreatePending || isUpdatePending || isDeletePending;
+
+  const form = useForm<ColorsFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      value: "",
     },
   });
 
-  const onSubmit = async (values: BillboardsFormValues) => {
+  const onSubmit = async (values: ColorsFormValues) => {
     if (initialData) {
-      await updateMutate({ id: initialData.id, ...values });
+      await updateMutate({
+        id: initialData.id,
+        name: values.value,
+        value: values.value,
+      });
     } else {
-      await createMutate(values);
+      await createMutate({
+        name: values.name,
+        value: values.value,
+      });
     }
   };
-
-  const onDelete = useServerActionMutation(deleteBillboardAction, {
-    onSuccess: () => {
-      toast.success("Billboard deleted");
-      router.refresh();
-      router.push(`/${params.storeId}/billboards`);
-    },
-    onError: () => {
-      toast.error("Something went wrong");
-    },
-  });
 
   return (
     <>
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={() => onDelete.mutate({ id: initialData?.id || "" })}
+        onConfirm={() => deleteMutate({ id: initialData?.id || "" })}
         loading={isPending}
       />
       <div className={"flex items-center justify-between"}>
@@ -132,36 +140,17 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className={"space-y-8 w-full"}
         >
-          <FormField
-            control={form.control}
-            name={"imageUrl"}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Background image</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    disabled={isPending}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange("")}
-                    value={field.value ? [field.value] : []}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className={"grid grid-cols-3 gap-8"}>
             <FormField
               control={form.control}
-              name={"label"}
+              name={"name"}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={isPending}
-                      placeholder={"Billboard label"}
+                      placeholder={"Color Name"}
                       {...field}
                     />
                   </FormControl>
@@ -169,9 +158,31 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name={"value"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Value</FormLabel>
+                  <FormControl>
+                    <div className={"flex items-center gap-x-4"}>
+                      <Input
+                        disabled={isPending}
+                        placeholder={"Color value"}
+                        {...field}
+                      />
+                      <div
+                        className={"border p-4 rounded-full"}
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-
-          <Button disabled={isPending} type="submit" className={"ml-auto"}>
+          <Button disabled={isPending} className={"ml-auto"} type={"submit"}>
             {isPending ? (
               <Loader2 className="animate-spin" size={16} />
             ) : (

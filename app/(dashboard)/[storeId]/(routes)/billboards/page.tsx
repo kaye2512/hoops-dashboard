@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import BillboardClient from "./_components/client";
+import BillboardClient from "./_components/billboard-client";
 import { BillboardColumn } from "./_components/columns";
 import { format } from "date-fns";
 

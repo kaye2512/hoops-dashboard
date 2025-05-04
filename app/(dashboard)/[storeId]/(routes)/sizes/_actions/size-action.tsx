@@ -1,16 +1,15 @@
 "use server";
-
+import { getUser } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { action } from "@/lib/zod-server-action/zsa";
 import { z } from "zod";
-import { getUser } from "@/lib/auth-session";
 import { ZSAError } from "zsa";
 
-export const createBillboardAction = action
+export const createSizeAction = action
   .input(
     z.object({
-      label: z.string().min(1),
-      imageUrl: z.string().min(1),
+      name: z.string().min(1),
+      value: z.string().min(1),
     })
   )
   .handler(async ({ input }) => {
@@ -26,18 +25,66 @@ export const createBillboardAction = action
     if (!store) {
       throw new ZSAError("NOT_FOUND", "Store not found or not owned by user");
     }
-    const billboard = await prisma.billboard.create({
+
+    const size = await prisma.size.create({
       data: {
-        label: input.label,
-        imageUrl: input.imageUrl,
+        name: input.name,
+        value: input.value,
         storeId: store.id,
       },
     });
 
-    return [billboard];
-  }); // createBillboardAction
+    return [size];
+  }); //createSizeAction
 
-export const deleteBillboardAction = action
+export const updateSizeAction = action
+  .input(
+    z.object({
+      id: z.string(),
+      name: z.string().min(1),
+      value: z.string().min(1),
+    })
+  )
+  .handler(async ({ input }) => {
+    const user = await getUser();
+    if (!user) {
+      throw new ZSAError("NOT_AUTHORIZED", "User not authenticated");
+    }
+
+    const store = await prisma.store.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+    if (!store) {
+      throw new ZSAError("NOT_FOUND", "Store not found or not owned by user");
+    }
+
+    const existingSize = await prisma.size.findFirst({
+      where: {
+        id: input.id,
+        storeId: store.id,
+      },
+    });
+
+    if (!existingSize) {
+      throw new ZSAError("NOT_FOUND", "Sizes does not exist");
+    }
+
+    const updatedSize = await prisma.size.update({
+      where: {
+        id: input.id,
+      },
+      data: {
+        name: input.name,
+        value: input.value,
+      },
+    });
+
+    return [updatedSize];
+  }); //updateSizeAction
+
+export const deleteSizeAction = action
   .input(
     z.object({
       id: z.string(),
@@ -48,75 +95,32 @@ export const deleteBillboardAction = action
     if (!user) {
       throw new ZSAError("NOT_AUTHORIZED", "User not authenticated");
     }
+
     const store = await prisma.store.findFirst({
       where: {
-        userId: user.id, // vérifier que le store appartient bien à l'user connecté
+        userId: user.id,
       },
     });
     if (!store) {
       throw new ZSAError("NOT_FOUND", "Store not found or not owned by user");
     }
-    const billboardId = await prisma.billboard.findFirst({
+
+    const existingSize = await prisma.size.findFirst({
       where: {
         id: input.id,
         storeId: store.id,
       },
     });
 
-    if (!billboardId) {
-      throw new ZSAError("NOT_FOUND", "Billboard not found");
+    if (!existingSize) {
+      throw new ZSAError("NOT_FOUND", "Size Does not exist");
     }
 
-    const deletedBillboard = await prisma.billboard.deleteMany({
+    const deletedSize = await prisma.size.delete({
       where: {
         id: input.id,
       },
     });
 
-    return [deletedBillboard];
-  }); // deleteBillboardAction
-
-export const updateBillboardAction = action
-  .input(
-    z.object({
-      id: z.string(),
-      label: z.string().min(1),
-      imageUrl: z.string().min(1),
-    })
-  )
-  .handler(async ({ input }) => {
-    const user = await getUser();
-    if (!user) {
-      throw new ZSAError("NOT_AUTHORIZED", "User not authenticated");
-    }
-    const store = await prisma.store.findFirst({
-      where: {
-        userId: user.id, // vérifier que le store appartient bien à l'user connecté
-      },
-    });
-    if (!store) {
-      throw new ZSAError("NOT_FOUND", "Store not found or not owned by user");
-    }
-    const billboardId = await prisma.billboard.findFirst({
-      where: {
-        id: input.id,
-        storeId: store.id,
-      },
-    });
-
-    if (!billboardId) {
-      throw new ZSAError("NOT_FOUND", "Billboard not found");
-    }
-
-    const billboard = await prisma.billboard.update({
-      where: {
-        id: input.id,
-      },
-      data: {
-        label: input.label,
-        imageUrl: input.imageUrl,
-      },
-    });
-
-    return [billboard];
-  }); // updateBillboardAction
+    return [deletedSize];
+  }); //deleteSizeAction

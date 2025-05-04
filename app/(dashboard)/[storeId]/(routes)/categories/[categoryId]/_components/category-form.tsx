@@ -27,7 +27,7 @@ import {
   createCategoryAction,
   deleteCategoryAction,
   updateCategoryAction,
-} from "../_actions/category-action";
+} from "../../_actions/category-action";
 import {
   Select,
   SelectContent,

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
-import CategoryClient from "./_components/client";
+import CategoryClient from "./_components/category-client";
 import { CategoryColumn } from "./_components/columns";
 
 export default async function CategoriesPage(props: {
