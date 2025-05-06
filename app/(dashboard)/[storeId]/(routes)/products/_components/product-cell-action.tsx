@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -26,10 +26,6 @@ export default function CellAction(props: CellActionProps) {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
-  const onCopy = (id: string) => {
-    navigator.clipboard.writeText(id);
-    toast.success("Billboards id copied to the clipboard");
-  };
 
   const onDelete = useServerActionMutation(deleteProductAction, {
     onSuccess: () => {
@@ -58,10 +54,7 @@ export default function CellAction(props: CellActionProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align={"end"}>
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => onCopy(props.data.id)}>
-            <Copy className={"mr-2 h-4 w-4"} />
-            Copy Id
-          </DropdownMenuItem>
+
           <DropdownMenuItem
             onClick={() =>
               router.push(`/${params.storeId}/products/${props.data.id}`)

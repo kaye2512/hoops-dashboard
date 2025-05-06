@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { ProductsColumn } from "./_components/columns";
-import ProductsClient from "./_components/product-client";
+import ProductsClient from "./_components/products-client";
 import { formater } from "@/lib/utils";
 import { ProductWithNumberPrice } from "./_types/product";
 

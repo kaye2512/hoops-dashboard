@@ -29,8 +29,6 @@ export default function SizesClient(props: SizesClientProps) {
       </div>
       <Separator />
       <DataTable searchKey={"name"} columns={columns} data={props.data} />
-      <Heading title={"Api"} description={"Api calls for sizes"} />
-      <Separator />
     </>
   );
 }

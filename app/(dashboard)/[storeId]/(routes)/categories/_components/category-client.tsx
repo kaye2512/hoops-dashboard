@@ -30,8 +30,6 @@ export default function CategoryClient(props: CategoryClientProps) {
       </div>
       <Separator />
       <DataTable searchKey={"name"} columns={columns} data={props.data} />
-      <Heading title={"Api"} description={"Api calls for category"} />
-      <Separator />
     </>
   );
 }

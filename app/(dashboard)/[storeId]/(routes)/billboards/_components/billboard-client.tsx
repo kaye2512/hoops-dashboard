@@ -30,8 +30,6 @@ export default function BillboardClient(props: BillboardClientProps) {
       </div>
       <Separator />
       <DataTable searchKey={"label"} columns={columns} data={props.data} />
-      <Heading title={"Api"} description={"Api calls for billBoard"} />
-      <Separator />
     </>
   );
 }

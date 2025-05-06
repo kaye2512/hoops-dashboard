@@ -29,8 +29,6 @@ export default function ProductsClient(props: ProductsClientProps) {
       </div>
       <Separator />
       <DataTable searchKey={"name"} columns={columns} data={props.data} />
-      <Heading title={"Api"} description={"Api calls for products"} />
-      <Separator />
     </>
   );
 }

@@ -28,8 +28,6 @@ export default function ColorsClient(props: ColorsClientProps) {
       </div>
       <Separator />
       <DataTable searchKey={"name"} columns={columns} data={props.data} />
-      <Heading title={"Api"} description={"Api calls for colors"} />
-      <Separator />
     </>
   );
 }
