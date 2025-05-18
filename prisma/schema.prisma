@@ -18,6 +18,8 @@ model User {
   name          String
   email         String
   emailVerified Boolean
+  password      String?
+  passwordConfirmation String?
   image         String?
   createdAt     DateTime
   updatedAt     DateTime

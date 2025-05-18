@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { getUser } from "@/lib/auth-session";
 import { NextResponse } from "next/server";
 
 const CORS_HEADERS = {
@@ -13,19 +12,10 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const user = await getUser();
-    if (!user) {
-      return new NextResponse("Unauthorized", {
-        status: 401,
-        headers: CORS_HEADERS,
-      });
-    }
-
     const colors = await prisma.color.findMany({
       where: {
         store: {
           id: params.storeId,
-          userId: user.id,
         },
       },
     });
