@@ -9,13 +9,19 @@ const CORS_HEADERS = {
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string } }
+  params: { params: Promise<{ storeId: string }> }
 ) {
   try {
+    const { storeId } = await params.params;
     const categories = await prisma.category.findMany({
       where: {
         store: {
-          id: params.storeId,
+          id: storeId,
+        },
+      },
+      include: {
+        products: {
+          include: { size: true, color: true, images: true },
         },
       },
     });

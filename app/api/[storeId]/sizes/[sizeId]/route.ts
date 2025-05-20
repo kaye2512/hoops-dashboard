@@ -9,15 +9,14 @@ const CORS_HEADERS = {
 
 export async function GET(
   req: Request,
-  { params }: { params: { storeId: string; sizeId: string } }
+  params: { params: Promise<{ storeId: string; sizeId: string }> }
 ) {
   try {
+    const { storeId, sizeId } = await params.params;
     const size = await prisma.size.findFirst({
       where: {
-        id: params.sizeId,
-        store: {
-          id: params.storeId,
-        },
+        id: sizeId,
+        storeId: storeId,
       },
       select: {
         id: true,
